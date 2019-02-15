@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
@@ -12,31 +12,11 @@ namespace MatrixTransformations
         private readonly Square _square;
         private readonly Square _square2;
         private readonly Square _square3;
+        private readonly Square _square4;
 
         public Form1()
         {
             InitializeComponent();
-
-            var v1 = new Vector();
-            Console.WriteLine(v1);
-            var v2 = new Vector(1, 2);
-            Console.WriteLine(v2);
-            var v3 = new Vector(2, 6);
-            Console.WriteLine(v3);
-            var v4 = v2 + v3;
-            Console.WriteLine(v4); // 3, 8
-
-            var m1 = new Matrix();
-            Console.WriteLine(m1); // 1, 0, 0, 1
-            var m2 = new Matrix(
-                2, 4,
-                -1, 3);
-            Console.WriteLine(m2);
-            Console.WriteLine(m1 + m2); // 3, 4, -1, 4
-            Console.WriteLine(m1 - m2); // -1, -4, 1, -2
-            Console.WriteLine(m2 * m2); // 0, 20, -5, 5
-
-            Console.WriteLine(m2 * v3); // 28, 16
 	
             Width = 800;
             Height = 600;
@@ -46,6 +26,7 @@ namespace MatrixTransformations
             _square = new Square(Color.Purple,100);
             _square2 = new Square(Color.Orange,100);
             _square3 = new Square(Color.SaddleBrown,100);
+            _square4 = new Square(Color.Aqua,100);
         }
 
         protected override void OnPaint(PaintEventArgs e)
@@ -65,15 +46,23 @@ namespace MatrixTransformations
             _square2.Draw(e.Graphics, ViewPortTransformation(Width, Height, vb));
 
             var rotate = Matrix.Rotate((float) (Math.PI / 4));
-            Console.WriteLine(rotate);
             vb = new List<Vector>();
             foreach (var vector in _square3.Vb)
             {
                 var newVector = rotate * vector;
-                Console.WriteLine(newVector);
                 vb.Add(newVector);
             }
             _square3.Draw(e.Graphics, ViewPortTransformation(Width, Height, vb));
+
+            var translate = Matrix.Translate(new Vector(50, 50));
+         
+            vb = new List<Vector>();
+            foreach (var vector in _square4.Vb)
+            {
+                var newVector = translate * vector;
+                vb.Add(newVector);
+            }
+            _square4.Draw(e.Graphics, ViewPortTransformation(Width, Height, vb));
         }
 
         public static List<Vector> ViewPortTransformation(float width, float height, List<Vector> vectors)

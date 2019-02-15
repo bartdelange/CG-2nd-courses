@@ -1,3 +1,4 @@
+using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MatrixTransformations;
 
@@ -9,7 +10,12 @@ namespace MatrixTransformationsTests
         [TestMethod]
         public void Test_Create_WithParameters()
         {
-            var testMatrix = new Matrix(1, 2, 3, 4);
+            var testMatrix = new Matrix(
+                1f, 2f, 0f, 0f,
+                3f, 4f, 0f, 0f,
+                0f, 0f, 1f, 0f,
+                0f, 0f, 0f, 1f
+            );
             
             Assert.AreEqual(testMatrix[0, 0], 1);
             Assert.AreEqual(testMatrix[0, 1], 2);
@@ -31,8 +37,17 @@ namespace MatrixTransformationsTests
         [TestMethod]
         public void Test_Addition()
         {
-            var left = new Matrix(1, 2, 3, 4);
-            var right = new Matrix(5, 6, 7, 8);
+            var left = Matrix.Identity();
+            left[0, 0] = 1f;
+            left[0, 1] = 2f;
+            left[1, 0] = 3f;
+            left[1, 1] = 4f;
+
+            var right = Matrix.Identity();                
+            right[0, 0] = 5f;
+            right[0, 1] = 6f;
+            right[1, 0] = 7f;
+            right[1, 1] = 8f;
             
             var result = left + right;
         
@@ -44,79 +59,118 @@ namespace MatrixTransformationsTests
 
         [TestMethod]
         public void Test_Subtraction()
-        {
-            var left = new Matrix(6, 8, 10, 12);
-            var right = new Matrix(5, 6, 7, 8);
+        {   
+            var left = Matrix.Identity();
+            left[0, 0] = 6f;
+            left[0, 1] = 7f;
+            left[1, 0] = 10f;
+            left[1, 1] = 12f;
+
+            var right = Matrix.Identity();                
+            right[0, 0] = 5f;
+            right[0, 1] = 6f;
+            right[1, 0] = 7f;
+            right[1, 1] = 8f;
             
             var result = left - right;
+            Console.WriteLine(result);
             
-            Assert.AreEqual(result[0, 0], 1);
-            Assert.AreEqual(result[0, 1], 1);
-            Assert.AreEqual(result[1, 0], 3);
-            Assert.AreEqual(result[1, 1], 4);
+            Assert.AreEqual(1, result[0, 0]);
+            Assert.AreEqual(2, result[0, 1]);
+            Assert.AreEqual(3, result[1, 0]);
+            Assert.AreEqual(4, result[1, 1]);
         }
 
         [TestMethod]
         public void Test_Float_Multiplication()
         {
-            var mtrx = new Matrix(1, 2, 3, 4);
+            var mtrx = Matrix.Identity();                
+            mtrx[0, 0] = 1f;
+            mtrx[0, 1] = 2f;
+            mtrx[1, 0] = 3f;
+            mtrx[1, 1] = 4f;
+
             const float flt = 2.0f;
             
             var result1 = mtrx * flt;
             var result2 = flt * mtrx;
             
-            Assert.AreEqual(result1[0, 0], 2);
-            Assert.AreEqual(result1[0, 1], 4);
-            Assert.AreEqual(result1[1, 0], 6);
-            Assert.AreEqual(result1[1, 1], 8);
+            Assert.AreEqual(2, result1[0, 0]);
+            Assert.AreEqual(4, result1[0, 1]);
+            Assert.AreEqual(6, result1[1, 0]);
+            Assert.AreEqual(8, result1[1, 1]);
             
-            Assert.AreEqual(result2[0, 0], 2);
-            Assert.AreEqual(result2[0, 1], 4);
-            Assert.AreEqual(result2[1, 0], 6);
-            Assert.AreEqual(result2[1, 1], 8);
+            Assert.AreEqual(2, result2[0, 0]);
+            Assert.AreEqual(4, result2[0, 1]);
+            Assert.AreEqual(6, result2[1, 0]);
+            Assert.AreEqual(8, result2[1, 1]);
         }
 
         [TestMethod]
         public void Test_Matrix_Multiplication()
         {
-            var mtrxL = new Matrix(1, 2, 3, 4);
-            var mtrxR = new Matrix(1, 2, 3, 4);
             
-            var result = mtrxL * mtrxR;
+            var left = Matrix.Identity();
+            left[0, 0] = 1f;
+            left[0, 1] = 2f;
+            left[1, 0] = 3f;
+            left[1, 1] = 4f;
             
-            Assert.AreEqual(result[0, 0], 7);
-            Assert.AreEqual(result[0, 1], 10);
-            Assert.AreEqual(result[1, 0], 15);
-            Assert.AreEqual(result[1, 1], 20);
+            var right = Matrix.Identity();
+            left[0, 0] = 1f;
+            left[0, 1] = 2f;
+            left[1, 0] = 3f;
+            left[1, 1] = 4f;
+
+            
+            var result = left * right;
+            
+            Assert.AreEqual(7,result[0, 0]);
+            Assert.AreEqual(10,result[0, 1]);
+            Assert.AreEqual(15,result[1, 0]);
+            Assert.AreEqual(22, result[1, 1]);
         }
 
         [TestMethod]
         public void Test_Matrix_Multiplication2()
         {
-            var mtrxL = new Matrix(1, 2, 3, 4);
-            var mtrxR = new Matrix(5, 6, 7, 8);
+            var left = Matrix.Identity();
+            left[0, 0] = 1f;
+            left[0, 1] = 2f;
+            left[1, 0] = 3f;
+            left[1, 1] = 4f;
+
+            var right = Matrix.Identity();                
+            right[0, 0] = 5f;
+            right[0, 1] = 6f;
+            right[1, 0] = 7f;
+            right[1, 1] = 8f;
             
-            var result = mtrxL * mtrxR;
+            var result = left * right;
             
-            Assert.AreEqual(result[0, 0], 19);
-            Assert.AreEqual(result[0, 1], 22);
-            Assert.AreEqual(result[1, 0], 43);
-            Assert.AreEqual(result[1, 1], 50);
+            Assert.AreEqual(19, result[0, 0]);
+            Assert.AreEqual(22, result[0, 1]);
+            Assert.AreEqual(43, result[1, 0]);
+            Assert.AreEqual(50, result[1, 1]);
         }
 
         [TestMethod]
         public void Test_Vector_Multiplication()
         {
-//            var mtrx = new Matrix(1, 2, 3, 4);
-//            const float flt = 2.0f;
-//            
-//            var result1 = mtrx * flt;
-//            var result2 = flt * mtrx;
-//            
-//            Assert.AreEqual(result1[0, 0], 2);
-//            Assert.AreEqual(result1[0, 1], 4);
-//            Assert.AreEqual(result1[1, 0], 6);
-//            Assert.AreEqual(result1[1, 1], 8);
+            var m = Matrix.Identity();
+            m[0, 0] = 1f;
+            m[0, 1] = 2f;
+            m[1, 0] = 3f;
+            m[1, 1] = 4f;
+
+            var v = new Vector(2, 2); 
+            
+            var result = m * v;
+            
+            Assert.AreEqual(19, result.X);
+            Assert.AreEqual(22, result.Y);
+            Assert.AreEqual(43, result.W);
+            Assert.AreEqual(50, result.Z);
         }
     }
 }
