@@ -244,14 +244,14 @@ namespace MatrixTransformationsTests
             m[1, 0] = 3f;
             m[1, 1] = 4f;
 
-            var v = new Vector(2, 2);
+            var v = new Vector(2, 2, 0, 1);
 
             var result = m * v;
 
             Assert.AreEqual(6, result.X);
             Assert.AreEqual(14, result.Y);
             Assert.AreEqual(0, result.Z);
-            Assert.AreEqual(0, result.W);
+            Assert.AreEqual(1, result.W);
         }
 
         #endregion
@@ -326,13 +326,13 @@ namespace MatrixTransformationsTests
         public void Test_MatrixTranslate()
         {
             // Setup/Act
-            var result = Matrix.Translate(new Vector(1, 1, 1));
+            var result = Matrix.Translate(new Vector(1, 1, 1, 1));
             
             // Assert
             var expected = new Matrix(
-                1, 0, 1, 0,
-                0, 1, 1, 0,
-                0, 0, 1, 0,
+                1, 0, 0, 1,
+                0, 1, 0, 1,
+                0, 0, 1, 1,
                 0, 0, 0, 1
             );
             AssertMatrix(expected, result);

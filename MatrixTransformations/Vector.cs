@@ -6,11 +6,8 @@
         public float Y { get; }
         public float Z { get; }
         public float W { get; }
-
-        public Vector() : this(0, 0, 0, 0)
-        {}
         
-        public Vector(float x, float y, float z = 0, float w = 0)
+        public Vector(float x, float y, float z, float w)
         {
             X = x;
             Y = y;

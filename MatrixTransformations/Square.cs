@@ -20,10 +20,10 @@ namespace MatrixTransformations
 
             Vb = new List<Vector>
             {
-                new Vector(-size, -size, 1), 
-                new Vector(size, -size, 1), 
-                new Vector(size, size, 1), 
-                new Vector(-size, size, 1)
+                new Vector(-size, -size, 0, 1), 
+                new Vector(size, -size, 0, 1), 
+                new Vector(size, size, 0, 1), 
+                new Vector(-size, size, 0, 1)
             };
         }
 

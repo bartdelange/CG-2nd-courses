@@ -5,17 +5,15 @@ namespace MatrixTransformations
 {
     public class AxisY
     {
-        private int _size;
-
-        public List<Vector> Vb;
+        public readonly List<Vector> Vb;
 
         public AxisY(int size = 100)
         {
-            _size = size;
-
-            Vb = new List<Vector>();
-            Vb.Add(new Vector(0, 0));
-            Vb.Add(new Vector(0, size));
+            Vb = new List<Vector>
+            {
+                new Vector(0, 0, 0, 1), 
+                new Vector(0, size, 0, 1)
+            };
         }
 
         public void Draw(Graphics g, List<Vector> vb)

@@ -196,10 +196,35 @@ namespace MatrixTransformations
         public static Matrix Translate(Vector t)
         {
             var matrix = Identity();
-            matrix[0, 2] = t.X;
-            matrix[1, 2] = t.Y;
-            matrix[2, 2] = t.Z;
+            matrix[0, 3] = t.X;
+            matrix[1, 3] = t.Y;
+            matrix[2, 3] = t.Z;
             return matrix;
+        }
+
+        public static Matrix ViewPort(float r, float phi, float theta)
+        {
+            var sinP = (float) Math.Sin(phi);
+            var cosP = (float) Math.Cos(phi);
+            var sinT = (float) Math.Sin(theta);
+            var cosT = (float) Math.Cos(theta);
+
+            return new Matrix(
+                -sinT, cosT, 0f, 0f,
+                -cosT * cosP, -cosP * sinT, sinP, 0f,
+                cosT * sinP, sinT * sinP, cosP, -r,
+                0f, 0f, 0f, 1f
+            );
+        }
+
+        public static Matrix Project(float d, float z)
+        {
+            return new Matrix(
+                -(d / z), 0f, 0f, 0f,
+                0f, -(d / z), 0f, 0f,
+                0f, 0f, 0f, 0f,
+                0f, 0f, 0f, 0f
+            );
         }
 
         #endregion
