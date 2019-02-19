@@ -1,4 +1,4 @@
-﻿﻿using System;
+﻿using System;
 
 namespace MatrixTransformations
 {
@@ -33,22 +33,22 @@ namespace MatrixTransformations
         )
         {
             _mat = new float[4, 4];
-            
+
             _mat[0, 0] = m11;
             _mat[0, 1] = m12;
             _mat[0, 2] = m13;
             _mat[0, 3] = m14;
-            
+
             _mat[1, 0] = m21;
             _mat[1, 1] = m22;
             _mat[1, 2] = m23;
             _mat[1, 3] = m24;
-            
+
             _mat[2, 0] = m31;
             _mat[2, 1] = m32;
             _mat[2, 2] = m33;
             _mat[2, 3] = m34;
-            
+
             _mat[3, 0] = m41;
             _mat[3, 1] = m42;
             _mat[3, 2] = m43;
@@ -58,11 +58,13 @@ namespace MatrixTransformations
         public Matrix(Vector v) : this(
             v.X, 0f, 0f, 0f,
             v.Y, 1f, 0f, 0f,
-            v.W, 0f, 1f, 0f,
-            v.Z, 0f, 0f, 1f
+            v.Z, 0f, 1f, 0f,
+            v.W, 0f, 0f, 1f
         )
         {
         }
+
+        #region Calculations
 
         public static Matrix operator +(Matrix m1, Matrix m2)
         {
@@ -117,7 +119,7 @@ namespace MatrixTransformations
         public static Matrix operator *(Matrix m1, Matrix m2)
         {
             var m3 = new Matrix();
-            
+
             for (var r = 0; r < m3.Rows; r++)
             {
                 for (var c = 0; c < m3.Columns; c++)
@@ -139,38 +141,57 @@ namespace MatrixTransformations
 
         public static Vector operator *(Matrix m1, Vector v)
         {
-            var matrix = m1 * new Matrix(v);  
+            var matrix = m1 * new Matrix(v);
             return matrix.ToVector();
         }
 
-        public static Matrix Identity()
-        {
-            return new Matrix();
-        }
+        #endregion
 
-        public Vector ToVector()
-        {
-            return new Vector(_mat[0, 0], _mat[1, 0]);
-        }
+        #region Transformations
 
         public static Matrix Scale(float s)
         {
             var mat = s * Identity();
-            mat[3,3] = 1;
+            mat[3, 3] = 1;
             return mat;
         }
 
-        public static Matrix Rotate(float degrees)
-        {
-            var radians = degrees * (Math.PI / 180);
+        #region Rotation
 
-            return new Matrix(
-                (float) Math.Cos(radians), (float) -Math.Sin(radians), 0f, 0f,
-                (float) Math.Sin(radians), (float) Math.Cos(radians), 0f, 0f,
-                0f, 0f, 1f, 0f,
-                0f, 0f, 0f, 1f
-            );
+        public static Matrix RotateX(float radians)
+        {
+            var rot = Identity();
+            rot[1, 1] = (float) Math.Cos(radians);
+            rot[1, 2] = (float) -Math.Sin(radians);
+            rot[2, 1] = (float) Math.Sin(radians);
+            rot[2, 2] = (float) Math.Cos(radians);
+
+            return rot;
         }
+
+        public static Matrix RotateY(float radians)
+        {
+            var rot = Identity();
+            rot[0, 0] = (float) Math.Cos(radians);
+            rot[0, 2] = (float) Math.Sin(radians);
+            rot[2, 0] = (float) -Math.Sin(radians);
+            rot[2, 2] = (float) Math.Cos(radians);
+
+            return rot;
+        }
+
+        public static Matrix RotateZ(float radians)
+        {
+            var rot = Identity();
+            rot[0, 0] = (float) Math.Cos(radians);
+            rot[0, 1] = (float) -Math.Sin(radians);
+            rot[1, 0] = (float) Math.Sin(radians);
+            rot[1, 1] = (float) Math.Cos(radians);
+
+            return rot;
+        }
+
+        #endregion
 
         public static Matrix Translate(Vector t)
         {
@@ -180,6 +201,10 @@ namespace MatrixTransformations
             matrix[2, 2] = t.Z;
             return matrix;
         }
+
+        #endregion
+
+        #region Utils
 
         public override string ToString()
         {
@@ -194,12 +219,25 @@ namespace MatrixTransformations
                     row += _mat[r, c] + ", ";
                 }
 
-                str += row.Substring(0, row.Length-2) + " },\n";
+                str += row.Substring(0, row.Length - 2) + " },\n";
             }
-            
-            str = str.Substring(0, str.Length-2) + "\n";
+
+            str = str.Substring(0, str.Length - 2) + "\n";
 
             return str + "}";
         }
+
+        public static Matrix Identity()
+        {
+            return new Matrix();
+        }
+
+        public Vector ToVector()
+        {
+            // If shit gets weird: remove _mat[3, 0]
+            return new Vector(_mat[0, 0], _mat[1, 0], _mat[2, 0], _mat[3, 0]);
+        }
+
+        #endregion
     }
 }

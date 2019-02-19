@@ -24,45 +24,29 @@ namespace MatrixTransformations
             _xAxis = new AxisX(200);
             _yAxis = new AxisY(200);
             _square = new Square(Color.Purple,100);
-            _square2 = new Square(Color.Orange,100);
-            _square3 = new Square(Color.SaddleBrown,100);
-            _square4 = new Square(Color.Aqua,100);
         }
 
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
 
+            var vb = new List<Vector>();
+            var rotate = Matrix.RotateZ((float) (Math.PI / 4));
+            var scale = Matrix.Scale(1.5f);
+            var translate = Matrix.Translate(new Vector(50, 50, 1, 0));
+            
+            Console.WriteLine(translate);
+
             _xAxis.Draw(e.Graphics, ViewPortTransformation(Width, Height, _xAxis.Vb));
             _yAxis.Draw(e.Graphics, ViewPortTransformation(Width, Height, _yAxis.Vb));
-            _square.Draw(e.Graphics, ViewPortTransformation(Width, Height, _square.Vb));
 
-            var scale = Matrix.Scale(1.5f);
-            var vb = new List<Vector>();
-            foreach (var vector in _square2.Vb)
-            {
-                vb.Add(scale * vector);
-            }
-            _square2.Draw(e.Graphics, ViewPortTransformation(Width, Height, vb));
-
-            var rotate = Matrix.Rotate((float) (Math.PI / 4));
             vb = new List<Vector>();
-            foreach (var vector in _square3.Vb)
+            foreach (var vector in _square.Vb)
             {
-                var newVector = rotate * vector;
+                var newVector = scale * translate * rotate * vector;
                 vb.Add(newVector);
             }
-            _square3.Draw(e.Graphics, ViewPortTransformation(Width, Height, vb));
-
-            var translate = Matrix.Translate(new Vector(50, 50));
-         
-            vb = new List<Vector>();
-            foreach (var vector in _square4.Vb)
-            {
-                var newVector = translate * vector;
-                vb.Add(newVector);
-            }
-            _square4.Draw(e.Graphics, ViewPortTransformation(Width, Height, vb));
+            _square.Draw(e.Graphics, ViewPortTransformation(Width, Height, vb));
         }
 
         public static List<Vector> ViewPortTransformation(float width, float height, List<Vector> vectors)
