@@ -32,6 +32,8 @@ namespace MatrixTransformations
         {
             InitializeComponent();
 
+            this.DoubleBuffered = true;
+
             Width = 800;
             Height = 600;
 
