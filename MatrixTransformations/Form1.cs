@@ -27,10 +27,24 @@ namespace MatrixTransformations
         private readonly AxisZ _zAxis;
         private readonly Cube _cube;
         private float _scale;
+        
+        static Timer myTimer = new Timer();
+
+        private void TimerEventProcessor(Object myObject,
+            EventArgs myEventArgs)
+        {
+            // Repaint and animation
+            doAnimation();
+            Invalidate();
+        }
 
         public Form1()
         {
             InitializeComponent();
+
+            myTimer.Tick += new EventHandler(TimerEventProcessor);
+            myTimer.Interval = 1000 / 30; // 1 sec / fps
+            myTimer.Start();
 
             this.DoubleBuffered = true;
 
@@ -98,10 +112,12 @@ namespace MatrixTransformations
         {
             if (e.KeyCode == Keys.Escape)
                 Application.Exit();
-            
+
             switch (e.KeyCode)
             {
                 case Keys.A: // Animate
+                    // Reset???
+                    Reset();
                     Phase = 1;
                     animating = true;
                     break;
@@ -131,7 +147,7 @@ namespace MatrixTransformations
 
                 // side comment: https://stackoverflow.com/questions/15022630/how-to-calculate-the-angle-from-rotation-matrix
                 // if we also want to show what angle of rotation is made
-                
+
                 case Keys.X: // Rotate x
                     if (e.Modifiers == Keys.Shift)
                         Rotation *= Matrix.RotateX((float) Math.PI / 180 * -1);
@@ -184,12 +200,9 @@ namespace MatrixTransformations
                         D += 1f;
                     break;
             }
-
-            DoAnimation();
-            Invalidate(); // Repaint
         }
 
-        private void DoAnimation()
+        private void doAnimation()
         {
             if (animating)
             {
