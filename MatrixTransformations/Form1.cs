@@ -19,6 +19,15 @@ namespace MatrixTransformations
         private float Phi { get; set; }
 
         private Matrix Rotation { get; set; }
+
+        public double XDegrees => Math.Abs(Math.Floor((180 / Math.PI) * Math.Round(Math.Atan2(Rotation[1, 2], Rotation[2, 2]),2)));
+
+        public double YDegrees => Math.Abs(Math.Floor((180 / Math.PI) * Math.Round(Math.Atan2(Rotation[0, 2],
+                                                  Math.Sqrt((Rotation[1, 2] * Rotation[1, 2]) +
+                                                            (Rotation[2, 2] * Rotation[2, 2]))),2)));
+
+        public double ZDegrees => Math.Abs(Math.Floor((180 / Math.PI) *Math.Round( Math.Atan2(Rotation[0, 1], Rotation[0, 0]),2)));
+
         private Matrix Scale { get; set; }
         private Matrix Translation { get; set; }
 
@@ -27,7 +36,7 @@ namespace MatrixTransformations
         private readonly AxisZ _zAxis;
         private readonly Cube _cube;
         private float _scale;
-        
+
         static Timer myTimer = new Timer();
 
         private void TimerEventProcessor(Object myObject,
@@ -145,9 +154,6 @@ namespace MatrixTransformations
                     Translation *= Matrix.Translate(new Vector(0f, 0f, .1f, 1f));
                     break;
 
-                // side comment: https://stackoverflow.com/questions/15022630/how-to-calculate-the-angle-from-rotation-matrix
-                // if we also want to show what angle of rotation is made
-
                 case Keys.X: // Rotate x
                     if (e.Modifiers == Keys.Shift)
                         Rotation *= Matrix.RotateX((float) Math.PI / 180 * -1);
@@ -252,7 +258,9 @@ namespace MatrixTransformations
 
         private void doPhase2()
         {
-            var degree = Math.Ceiling((180 / Math.PI) * Math.Atan2(Rotation[1, 2], Rotation[2, 2]));
+            Theta -= 1;
+            Rotation *= Matrix.RotateX((float) Math.PI / 180 * xRotationStep);
+            var degree = XDegrees;
             if (xRotationStep > 0)
             {
                 if (degree >= 45 || degree <= -45) // if below 45 degrees
@@ -266,16 +274,13 @@ namespace MatrixTransformations
                     Phase = 3;
                 }
             }
-
-            Theta -= 1;
-            Rotation *= Matrix.RotateX((float) Math.PI / 180 * xRotationStep);
         }
 
         private void doPhase3()
         {
-            var degree = Math.Ceiling((180 / Math.PI) * Math.Atan2(Rotation[0, 2],
-                                          Math.Sqrt((Rotation[1, 2] * Rotation[1, 2]) +
-                                                    (Rotation[2, 2] * Rotation[2, 2]))));
+            Phi += 1;
+            Rotation *= Matrix.RotateY((float) Math.PI / 180 * yRotationStep);
+            var degree = YDegrees;
             if (yRotationStep > 0)
             {
                 if (degree >= 45 || degree <= -45) // if below 45 degrees
@@ -289,9 +294,6 @@ namespace MatrixTransformations
                     Phase = 4;
                 }
             }
-
-            Phi += 1;
-            Rotation *= Matrix.RotateY((float) Math.PI / 180 * yRotationStep);
         }
 
         private void doPhase4()
@@ -335,7 +337,10 @@ namespace MatrixTransformations
                         $"d:     {D}\n" +
                         $"phi:   {Phi}\n" +
                         $"theta: {Theta}\n" +
-                        $"phase: {Phase}\n";
+                        $"phase: {Phase}\n\n" +
+                        $"X Rotation: {XDegrees}\n" +
+                        $"Y Rotation: {YDegrees}\n" +
+                        $"Z Rotation: {ZDegrees}\n";
 
             e.Graphics.DrawString(stats, new Font("Arial", 12), Brushes.Black, 20, 20);
         }
