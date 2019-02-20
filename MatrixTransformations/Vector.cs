@@ -1,4 +1,4 @@
-﻿﻿namespace MatrixTransformations
+﻿namespace MatrixTransformations
 {
     public class Vector
     {
@@ -6,7 +6,7 @@
         public float Y { get; }
         public float Z { get; }
         public float W { get; }
-        
+
         public Vector(float x, float y, float z, float w)
         {
             X = x;
@@ -14,6 +14,7 @@
             Z = z;
             W = w;
         }
+
         public static Vector operator +(Vector v1, Vector v2)
         {
             return new Vector(v1.X + v2.X, v1.Y + v2.Y, v1.Z + v2.Z, v1.W + v2.W);
@@ -31,9 +32,9 @@
         public override string ToString()
         {
             var str = $"/ {X} \\\n";
-            str +=    $"| {Y} |\n";
-            str +=    $"| {Z} |\n";
-            str +=    $"\\ {W} /";
+            str += $"| {Y} |\n";
+            str += $"| {Z} |\n";
+            str += $"\\ {W} /";
             return str;
         }
     }

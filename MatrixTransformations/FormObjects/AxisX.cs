@@ -7,11 +7,11 @@ namespace MatrixTransformations
     {
         public readonly List<Vector> Vb;
 
-        public AxisX(int size=100)
+        public AxisX(int size = 100)
         {
             Vb = new List<Vector>
             {
-                new Vector(0, 0, 0, 1), 
+                new Vector(0, 0, 0, 1),
                 new Vector(size, 0, 0, 1)
             };
         }
