@@ -56,13 +56,20 @@ namespace MatrixTransformations
             D = 500;
             Theta = InitTheta;
             Phi = InitPhi;
+
+            // animation values
+            animating = false;
+            scaleStep = 0.01f;
+            xRotationStep = 1f;
+            yRotationStep = 1f;
+            Phase = 0;
         }
 
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
             PrintHelpText(e);
-            
+
             _xAxis.Draw(e.Graphics, ViewportTransformation(Width, Height, _xAxis.Vb).ToList());
             _yAxis.Draw(e.Graphics, ViewportTransformation(Width, Height, _yAxis.Vb).ToList());
             _zAxis.Draw(e.Graphics, ViewportTransformation(Width, Height, _zAxis.Vb).ToList());
@@ -73,6 +80,7 @@ namespace MatrixTransformations
                 var v = Translation * Rotation * Scale * vector;
                 vb.Add(v);
             }
+
             _cube.Draw(e.Graphics, ViewportTransformation(Width, Height, vb).ToList());
         }
 
@@ -80,7 +88,7 @@ namespace MatrixTransformations
         {
             foreach (var vector in vb)
             {
-                var view = Matrix.ViewPort(R,(float) Math.PI / 180 * Phi, (float) Math.PI / 180 * Theta) * vector;
+                var view = Matrix.ViewPort(R, (float) Math.PI / 180 * Phi, (float) Math.PI / 180 * Theta) * vector;
                 var projection = Matrix.Project(D, view.Z) * view;
                 yield return new Vector(projection.X + width / 2, -projection.Y + height / 2, 0, 1);
             }
@@ -91,14 +99,14 @@ namespace MatrixTransformations
             if (e.KeyCode == Keys.Escape)
                 Application.Exit();
             
-            if (e.KeyCode == Keys.C)
-            {
-                Reset();
-            }
-                        
             switch (e.KeyCode)
             {
-                case Keys.A: // Reset all
+                case Keys.A: // Animate
+                    Phase = 1;
+                    animating = true;
+                    break;
+                case Keys.C: // Reset all
+                    animating = false;
                     Reset();
                     break;
 
@@ -106,10 +114,10 @@ namespace MatrixTransformations
                     Translation *= Matrix.Translate(new Vector(-.1f, 0f, 0f, 1f));
                     break;
                 case Keys.Right: // Move x up
-                    Translation *= Matrix.Translate(new Vector(.1f, 0f, 0f, 1f)); 
+                    Translation *= Matrix.Translate(new Vector(.1f, 0f, 0f, 1f));
                     break;
                 case Keys.Up: // Move y down
-                    Translation *= Matrix.Translate(new Vector(0, .1f, 0f, 1f)); 
+                    Translation *= Matrix.Translate(new Vector(0, .1f, 0f, 1f));
                     break;
                 case Keys.Down: // Move y up
                     Translation *= Matrix.Translate(new Vector(0f, -.1f, 0f, 1f));
@@ -121,6 +129,9 @@ namespace MatrixTransformations
                     Translation *= Matrix.Translate(new Vector(0f, 0f, .1f, 1f));
                     break;
 
+                // side comment: https://stackoverflow.com/questions/15022630/how-to-calculate-the-angle-from-rotation-matrix
+                // if we also want to show what angle of rotation is made
+                
                 case Keys.X: // Rotate x
                     if (e.Modifiers == Keys.Shift)
                         Rotation *= Matrix.RotateX((float) Math.PI / 180 * -1);
@@ -145,7 +156,6 @@ namespace MatrixTransformations
                         _scale -= .1f;
                     else
                         _scale += .1f;
-                    
                     Scale = Matrix.Scale(_scale);
                     break;
 
@@ -174,13 +184,122 @@ namespace MatrixTransformations
                         D += 1f;
                     break;
             }
-            
+
+            DoAnimation();
             Invalidate(); // Repaint
+        }
+
+        private void DoAnimation()
+        {
+            if (animating)
+            {
+                switch (Phase)
+                {
+                    case 1:
+                        doPhase1();
+                        break;
+                    case 2:
+                        doPhase2();
+                        break;
+                    case 3:
+                        doPhase3();
+                        break;
+                    case 4:
+                        doPhase4();
+                        break;
+                }
+            }
+        }
+
+        public bool animating { get; set; } = false;
+        private float scaleStep = 0.01f;
+        private float xRotationStep = 1f;
+        private float yRotationStep = 1f;
+        public int Phase { get; set; } = 0;
+
+        private void doPhase1()
+        {
+            Theta -= 1;
+            _scale += scaleStep;
+            Scale = Matrix.Scale(_scale);
+            if (scaleStep > 0)
+            {
+                if (_scale >= 1.49)
+                    scaleStep = -scaleStep;
+            }
+            else if (scaleStep < 0)
+            {
+                if (_scale <= 1.0)
+                {
+                    scaleStep = -scaleStep;
+                    Phase = 2;
+                }
+            }
+        }
+
+        private void doPhase2()
+        {
+            var degree = Math.Ceiling((180 / Math.PI) * Math.Atan2(Rotation[1, 2], Rotation[2, 2]));
+            if (xRotationStep > 0)
+            {
+                if (degree >= 45 || degree <= -45) // if below 45 degrees
+                    xRotationStep = -xRotationStep;
+            }
+            else if (xRotationStep < 0)
+            {
+                if (degree == 0) // if 0 degrees again
+                {
+                    xRotationStep = -xRotationStep;
+                    Phase = 3;
+                }
+            }
+
+            Theta -= 1;
+            Rotation *= Matrix.RotateX((float) Math.PI / 180 * xRotationStep);
+        }
+
+        private void doPhase3()
+        {
+            var degree = Math.Ceiling((180 / Math.PI) * Math.Atan2(Rotation[0, 2],
+                                          Math.Sqrt((Rotation[1, 2] * Rotation[1, 2]) +
+                                                    (Rotation[2, 2] * Rotation[2, 2]))));
+            if (yRotationStep > 0)
+            {
+                if (degree >= 45 || degree <= -45) // if below 45 degrees
+                    yRotationStep = -yRotationStep;
+            }
+            else if (yRotationStep < 0)
+            {
+                if (degree == 0) // if 0 degrees again
+                {
+                    yRotationStep = -yRotationStep;
+                    Phase = 4;
+                }
+            }
+
+            Phi += 1;
+            Rotation *= Matrix.RotateY((float) Math.PI / 180 * yRotationStep);
+        }
+
+        private void doPhase4()
+        {
+            if (Theta == InitTheta && Phi == InitPhi)
+            {
+                Phase = 1;
+            }
+            else
+            {
+                if (Theta != InitTheta)
+                    Theta += 1;
+                if (Phi != InitPhi)
+                    Phi -= 1;
+            }
         }
 
         public void PrintHelpText(PaintEventArgs e)
         {
-            var keys = "A: Reset all\n" +
+            var keys = "A: Start Animation\n" +
+                       "C: Reset all\n" +
                        "Left: Move x up\n" +
                        "Right: Move x down\n" +
                        "Up: Move y up\n" +
@@ -195,16 +314,16 @@ namespace MatrixTransformations
                        "p/P: Adjust Phi\n" +
                        "t/T: Adjust Theta\n" +
                        "d/D: Adjust distance\n";
-            
+
             e.Graphics.DrawString(keys, new Font("Arial", 12), Brushes.Black, 20, Height / 3);
-            
+
             var stats = $"s:     {_scale}\n" +
                         $"r:     {R}\n" +
                         $"d:     {D}\n" +
                         $"phi:   {Phi}\n" +
                         $"theta: {Theta}\n" +
-                        $"phase: animphase\n";
-            
+                        $"phase: {Phase}\n";
+
             e.Graphics.DrawString(stats, new Font("Arial", 12), Brushes.Black, 20, 20);
         }
     }
