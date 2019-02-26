@@ -67,7 +67,6 @@ namespace MatrixTransformations
         private void Reset()
         {
             Scale = Matrix.Identity();
-//            Rotation = Matrix.Identity();
             XDegrees = 0;
             YDegrees = 0;
             ZDegrees = 0;
