@@ -62,7 +62,8 @@ namespace MatrixTransformations
         private void DoPhase2()
         {
             Form.Theta -= 1;
-            Form.Rotation *= Matrix.RotateX((float) Math.PI / 180 * XRotationStep);
+//            Form.Rotation *= Matrix.RotateX((float) Math.PI / 180 * XRotationStep);
+            Form.XDegrees += XRotationStep;
             var degree = Form.XDegrees;
             if (XRotationStep > 0)
             {
@@ -82,7 +83,8 @@ namespace MatrixTransformations
         private void DoPhase3()
         {
             Form.Phi += 1;
-            Form.Rotation *= Matrix.RotateY((float) Math.PI / 180 * YRotationStep);
+//            Form.Rotation *= Matrix.RotateY((float) Math.PI / 180 * YRotationStep);
+            Form.YDegrees += YRotationStep;
             var degree = Form.YDegrees;
             if (YRotationStep > 0)
             {

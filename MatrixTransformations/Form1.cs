@@ -17,17 +17,9 @@ namespace MatrixTransformations
         public float Theta { get; set; }
         public float Phi { get; set; }
 
-        public Matrix Rotation { get; set; }
-
-        public double XDegrees =>
-            Math.Abs(Math.Floor(180 / Math.PI * Math.Round(Math.Atan2(Rotation[1, 2], Rotation[2, 2]), 2)));
-
-        public double YDegrees => Math.Abs(Math.Floor(180 / Math.PI * Math.Round(Math.Atan2(Rotation[0, 2],
-                                                          Math.Sqrt(Rotation[1, 2] * Rotation[1, 2] +
-                                                                    Rotation[2, 2] * Rotation[2, 2])), 2)));
-
-        public double ZDegrees =>
-            Math.Abs(Math.Floor(180 / Math.PI * Math.Round(Math.Atan2(Rotation[0, 1], Rotation[0, 0]), 2)));
+        public double XDegrees { get; set; }
+        public double YDegrees { get; set; }
+        public double ZDegrees { get; set; }
 
         public Matrix Scale { get; set; }
         public Matrix Translation { get; set; }
@@ -75,7 +67,10 @@ namespace MatrixTransformations
         private void Reset()
         {
             Scale = Matrix.Identity();
-            Rotation = Matrix.Identity();
+//            Rotation = Matrix.Identity();
+            XDegrees = 0;
+            YDegrees = 0;
+            ZDegrees = 0;
             Translation = Matrix.Identity();
             CurrentScale = 1;
 
@@ -101,10 +96,16 @@ namespace MatrixTransformations
             _yAxis.Draw(e.Graphics, ViewportTransformation(Width, Height, _yAxis.Vb).ToList());
             _zAxis.Draw(e.Graphics, ViewportTransformation(Width, Height, _zAxis.Vb).ToList());
 
+            var rotation = Matrix.RotateX((float) (Math.PI / 180 * XDegrees));
+            rotation *= Matrix.RotateZ((float) (Math.PI / 180 * ZDegrees));
+            rotation *= Matrix.RotateY((float) (Math.PI / 180 * YDegrees));
+
             var vb = new List<Vector>();
             foreach (var vector in _cube.Vb)
             {
-                var v = Translation * Rotation * Scale * vector;
+                var v = Translation * Matrix.RotateX((float) (Math.PI / 180 * XDegrees)) *
+                        Matrix.RotateY((float) (Math.PI / 180 * YDegrees)) *
+                        Matrix.RotateZ((float) (Math.PI / 180 * ZDegrees)) * Scale * vector;
                 vb.Add(v);
             }
 
@@ -159,21 +160,21 @@ namespace MatrixTransformations
 
                 case Keys.X: // Rotate x
                     if (e.Modifiers == Keys.Shift)
-                        Rotation *= Matrix.RotateX((float) Math.PI / 180 * -1);
+                        XDegrees--;
                     else
-                        Rotation *= Matrix.RotateX((float) Math.PI / 180 * 1);
+                        XDegrees++;
                     break;
                 case Keys.Y: // Rotate y
                     if (e.Modifiers == Keys.Shift)
-                        Rotation *= Matrix.RotateY((float) Math.PI / 180 * -1);
+                        YDegrees--;
                     else
-                        Rotation *= Matrix.RotateY((float) Math.PI / 180 * 1);
+                        YDegrees++;
                     break;
                 case Keys.Z: // Rotate z
                     if (e.Modifiers == Keys.Shift)
-                        Rotation *= Matrix.RotateZ((float) Math.PI / 180 * -1);
+                        ZDegrees--;
                     else
-                        Rotation *= Matrix.RotateZ((float) Math.PI / 180 * 1);
+                        ZDegrees++;
                     break;
 
                 case Keys.S: // Adjust scale
@@ -223,27 +224,27 @@ namespace MatrixTransformations
                         $"Y Rotation: \t {YDegrees}°\n" +
                         $"Z Rotation: \t {ZDegrees}°\n" +
                         $"Anim phase: \t {_anim.Phase}\n";
-            
+
             var keysInfo = "KEY BINDINGS:\n" +
-                       "A: \t\t Start Animation\n" +
-                       "C: \t\t Reset all\n" +
-                       "Left: \t\t Move x up\n" +
-                       "Right: \t\t Move x down\n" +
-                       "Up: \t\t Move y up\n" +
-                       "Down: \t\t Move y down\n" +
-                       "PageUp: \t Move z up\n" +
-                       "PageDown: \t Move z down\n" +
-                       "x/X: \t\t Rotate x\n" +
-                       "y/Y: \t\t Rotate y\n" +
-                       "z/Z: \t\t Rotate z\n" +
-                       "s/S: \t\t Adjust scale\n" +
-                       "r/R: \t\t Modify R\n" +
-                       "p/P: \t\t Adjust Phi\n" +
-                       "t/T: \t\t Adjust Theta\n" +
-                       "d/D: \t\t Adjust distance\n";
+                           "A: \t\t Start Animation\n" +
+                           "C: \t\t Reset all\n" +
+                           "Left: \t\t Move x up\n" +
+                           "Right: \t\t Move x down\n" +
+                           "Up: \t\t Move y up\n" +
+                           "Down: \t\t Move y down\n" +
+                           "PageUp: \t Move z up\n" +
+                           "PageDown: \t Move z down\n" +
+                           "x/X: \t\t Rotate x\n" +
+                           "y/Y: \t\t Rotate y\n" +
+                           "z/Z: \t\t Rotate z\n" +
+                           "s/S: \t\t Adjust scale\n" +
+                           "r/R: \t\t Modify R\n" +
+                           "p/P: \t\t Adjust Phi\n" +
+                           "t/T: \t\t Adjust Theta\n" +
+                           "d/D: \t\t Adjust distance\n";
 
             var helpText = stats + "\n\n" + keysInfo;
-            
+
             e.Graphics.DrawString(helpText, new Font("Arial", 10), Brushes.Black, 20, 20);
         }
     }
