@@ -95,16 +95,14 @@ namespace MatrixTransformations
             _yAxis.Draw(e.Graphics, ViewportTransformation(Width, Height, _yAxis.Vb).ToList());
             _zAxis.Draw(e.Graphics, ViewportTransformation(Width, Height, _zAxis.Vb).ToList());
 
-            var rotation = Matrix.RotateX((float) (Math.PI / 180 * XDegrees));
-            rotation *= Matrix.RotateZ((float) (Math.PI / 180 * ZDegrees));
-            rotation *= Matrix.RotateY((float) (Math.PI / 180 * YDegrees));
+            var rotation = Matrix.RotateX((float) (Math.PI / 180 * XDegrees)) * Matrix.RotateZ((float) (Math.PI / 180 * ZDegrees)) * Matrix.RotateY((float) (Math.PI / 180 * YDegrees));
 
+            var transform = Translation * rotation * Scale;
+            
             var vb = new List<Vector>();
             foreach (var vector in _cube.Vb)
             {
-                var v = Translation * Matrix.RotateX((float) (Math.PI / 180 * XDegrees)) *
-                        Matrix.RotateY((float) (Math.PI / 180 * YDegrees)) *
-                        Matrix.RotateZ((float) (Math.PI / 180 * ZDegrees)) * Scale * vector;
+                var v = transform * vector;
                 vb.Add(v);
             }
 
